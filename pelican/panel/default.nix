@@ -52,7 +52,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     chmod -R u+w $out/share
     mv $out/share/php/pelican-panel/* $out/
 
-    rm -rf $out/share $out/storage $out/bootstrap/cache
+    rm -rf $out/share $out/plugins $out/storage $out/bootstrap/cache
     ln -s ${dataDir}/.env $out/.env
     ln -s ${dataDir}/plugins $out/plugins
     ln -s ${dataDir}/bootstrap/cache $out/bootstrap/cache
