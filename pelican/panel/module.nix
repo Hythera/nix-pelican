@@ -640,8 +640,6 @@ in
       };
     };
 
-    networking.firewall.allowedTCPPorts = [ 80 ];
-
     environment.systemPackages = [ pelicanCli ];
   };
 }
