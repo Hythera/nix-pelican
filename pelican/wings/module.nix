@@ -11,7 +11,7 @@ let
     debug = cfg.debug;
     app_name = cfg.appName;
     uuid = cfg.uuid;
-    token_id = if cfg.tokenIdFile != null then "@TOKNE_ID@" else cfg.tokenId;
+    token_id = if cfg.tokenIdFile != null then "@TOKEN_ID@" else cfg.tokenId;
     token = if cfg.tokenFile != null then "@TOKEN@" else cfg.token;
     api = {
       host = cfg.api.host;
