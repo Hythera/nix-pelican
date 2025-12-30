@@ -1,0 +1,28 @@
+      ❌ 1s Failed: Child process exited with error code: 1
+ beta ❌ 1s Evaluation failed: Child process exited with error code: 1                                                                                                                               
+ERROR Failed to evaluate beta - Last 20 lines of logs:
+ERROR   stderr) 
+ERROR   stderr)        … while evaluating the attribute 'value'
+ERROR   stderr)          at /nix/store/1ny7brxnqbx6xilj7mjdlinzpb5a1s3i-source/lib/modules.nix:1118:7:
+ERROR   stderr)          1117|     // {
+ERROR   stderr)          1118|       value = addErrorContext "while evaluating the option `${showOption loc}':" value;
+ERROR   stderr)              |       ^
+ERROR   stderr)          1119|       inherit (res.defsFinal') highestPrio;
+ERROR   stderr) 
+ERROR   stderr)        … while evaluating the option `system.build.toplevel':
+ERROR   stderr) 
+ERROR   stderr)        … while evaluating definitions from `/nix/store/1ny7brxnqbx6xilj7mjdlinzpb5a1s3i-source/nixos/modules/system/activation/top-level.nix':
+ERROR   stderr) 
+ERROR   stderr)        (stack trace truncated; use '--show-trace' to show the full, detailed trace)
+ERROR   stderr) 
+ERROR   stderr)        error:
+ERROR   stderr)        Failed assertions:
+ERROR   stderr)        - The following users have a primary group that is undefined: redis-pelican-panel
+ERROR   stderr)        Hint: Add this to your NixOS configuration:
+ERROR   stderr)          users.groups.redis-pelican-panel = {};
+ERROR  failure) Child process exited with error code: 1
+ERROR Failed to complete requested operation - Last 1 lines of logs:
+ERROR  failure) Child process exited with error code: 1
+ERROR -----
+ERROR Operation failed with error: Child process exited with error code: 1
+Hint: Backtrace available - Use `RUST_BACKTRACE=1` environment variable to display a backtrace

@@ -5,7 +5,7 @@
   ...
 }:
 let
-  cfg = config.services.pelican.panel;
+  cfg = config.services.pterodactyl.panel;
 
   env =
     (lib.filterAttrs (n: v: v != null) {
@@ -13,16 +13,16 @@ let
       APP_ENV = cfg.app.env;
       APP_DEBUG = cfg.app.debug;
       APP_KEY = if cfg.app.keyFile != null then "@APP_KEY@" else cfg.app.key;
-      APP_LOCALE = cfg.app.locale;
+      APP_TIMEZONE = cfg.app.timezone;
       APP_URL = cfg.app.url;
-      APP_INSTALLED = true;
+      APP_ENVIRONMENT_ONLY = cfg.app.environmentOnly;
 
-      DB_CONNECTION = "mariadb";
+      DB_CONNECTION = "mysql";
       DB_HOST = if cfg.database.createLocally then "localhost" else cfg.database.host;
       DB_PORT = cfg.database.port;
       DB_DATABASE = cfg.database.name;
       DB_USERNAME = cfg.database.user;
-      DB_PASSWORD = cfg.database.password;
+      DB_PASSWORD = if cfg.database.passwordFile != null then "@DB_PASSWORD@" else cfg.database.password;
       DB_SOCKET = if cfg.database.createLocally then "/run/mysqld/mysqld.sock" else null;
 
       REDIS_SCHEME = if cfg.redis.createLocally then "unix" else "tcp";
@@ -33,27 +33,31 @@ let
           null;
       REDIS_HOST = if cfg.redis.createLocally then null else cfg.redis.host;
       REDIS_PORT = if cfg.redis.createLocally then null else cfg.redis.port;
-      REDIS_USERNAME = null;
       REDIS_PASSWORD = if cfg.redis.passwordFile != null then "@REDIS_PASSWORD@" else cfg.redis.password;
 
-      CACHE_STORE = cfg.cacheStore;
+      CACHE_DRIVER = cfg.cacheDriver;
       QUEUE_CONNECTION = cfg.queueConnection;
       SESSION_DRIVER = cfg.sessionDriver;
+
+      HASHIDS_SALT = if cfg.hashids.saltFile != null then "@HASHIDS_SALT@" else cfg.hashids.salt;
+      HASHIDS_LENGTH = cfg.hashids.length;
 
       MAIL_MAILER = cfg.mail.mailer;
       MAIL_HOST = cfg.mail.host;
       MAIL_PORT = cfg.mail.port;
       MAIL_USERNAME = cfg.mail.username;
+      MAIL_PASSWORD = if cfg.mail.passwordFile != null then "@MAIL_PASSWORD@" else cfg.mail.password;
       MAIL_ENCRYPTION = cfg.mail.encryption;
-      MAIL_FROM_ADRESS = cfg.mail.fromAddress;
+      MAIL_FROM_ADDRESS = cfg.mail.fromAddress;
       MAIL_FROM_NAME = cfg.mail.fromName;
 
       TRUSTED_PROXIES = builtins.concatStringsSep "," cfg.trustedProxies;
+      PTERODACTYL_TELEMETRY_ENABLED = cfg.telemetry.enable;
     })
     // cfg.extraEnvironment;
 
   setupScript = pkgs.writeShellApplication {
-    name = "pelican-panel-setup";
+    name = "pterodactyl-panel-setup";
     runtimeInputs = with pkgs; [
       coreutils
       replace-secret
@@ -61,7 +65,7 @@ let
     ];
     text = ''
       install -Dm640 -o ${cfg.user} -g ${cfg.group} ${
-        pkgs.writeText "pelican.env" (
+        pkgs.writeText "pterodactyl.env" (
           lib.generators.toKeyValue {
             mkKeyValue = lib.generators.mkKeyValueDefault {
               mkValueString =
@@ -87,6 +91,10 @@ let
         replace-secret '@REDIS_PASSWORD@' ${lib.escapeShellArg cfg.redis.passwordFile} ${cfg.dataDir}/.env
       ''}
 
+      ${lib.optionalString (cfg.hashids.saltFile != null) ''
+        replace-secret '@HASHIDS_SALT@' ${lib.escapeShellArg cfg.hashids.saltFile} ${cfg.dataDir}/.env
+      ''}
+
       ${lib.optionalString (cfg.mail.passwordFile != null) ''
         replace-secret '@MAIL_PASSWORD@' ${lib.escapeShellArg cfg.mail.passwordFile} ${cfg.dataDir}/.env
       ''}
@@ -97,70 +105,73 @@ let
 
       php ${cfg.package}/artisan migrate --seed --force
       php ${cfg.package}/artisan optimize:clear
-    ''; # HYTHERA: Fix cd?
+    '';
   };
 
-  pelicanCli = pkgs.writeShellApplication {
-    name = "pelican-cli";
+  pterodactylCli = pkgs.writeShellApplication {
+    name = "pterodactyl-cli";
     runtimeInputs = [ cfg.phpPackage ];
     text = ''
-      cd ${cfg.dataDir}
-      echo ${cfg.package}
+      cd ${cfg.rootDir}
       php ${cfg.package}/artisan "$@"
-    ''; # HYTHERA: Fix?
+    '';
   };
 
   cfgService = {
     User = cfg.user;
     Group = cfg.group;
     WorkingDirectory = cfg.package;
-    StateDirectory = "pelican-panel";
+    StateDirectory = "pterodactyl-panel";
     ReadWritePaths = [ cfg.dataDir ];
   };
 in
 {
-  options.services.pelican.panel = {
-    enable = lib.mkEnableOption "Pelican Panel";
+  options.services.pterodactyl.panel = {
+    enable = lib.mkEnableOption "Pterodactyl Panel";
 
     package = lib.mkOption {
       type = lib.types.package;
-      default = pkgs.pelican.panel;
-      defaultText = "pkgs.pelican.panel";
-      description = "Pelican Panel package to use";
+      default = pkgs.pterodactyl.panel;
+      defaultText = "pkgs.pterodactyl.panel";
+      description = "Pterodactyl Panel package to use";
     };
 
     phpPackage = lib.mkOption {
       type = lib.types.package;
       readOnly = true;
-      default = pkgs.php84.buildEnv {
+      default = pkgs.php83.buildEnv {
         extensions =
           { enabled, all }:
           enabled
           ++ (with all; [
             bcmath
             curl
+            dom
             gd
-            intl
             mbstring
             mysqli
-            sqlite3
-            zip
+            opcache
+            pdo
+            pdo_mysql
+            rediszip
           ]);
       };
       defaultText = lib.literalExpression ''
-        pkgs.php84.buildEnv {
+        pkgs.php83.buildEnv {
           extensions =
             { enabled, all }:
             enabled
             ++ (with all; [
-             bcmath
+              bcmath
               curl
+              dom
               gd
-              intl
               mbstring
-              mysql
-              sqlite3
-              zip
+              mysqli
+              opcache
+              pdo
+              pdo_mysql
+              rediszip
             ]);
         };
       '';
@@ -169,13 +180,13 @@ in
 
     user = lib.mkOption {
       type = lib.types.str;
-      default = "pelican-panel";
+      default = "pterodactyl-panel";
       description = "User to run the panel as";
     };
 
     group = lib.mkOption {
       type = lib.types.str;
-      default = "pelican-panel";
+      default = "pterodactyl-panel";
       description = "Group to run the panel as";
     };
 
@@ -187,14 +198,14 @@ in
 
     dataDir = lib.mkOption {
       type = lib.types.path;
-      default = "/var/lib/pelican-panel";
+      default = "/var/lib/pterodactyl-panel";
       description = "The root directory where all of the panel's data is stored";
     };
 
     app = {
       name = lib.mkOption {
         type = lib.types.str;
-        default = "Pelican";
+        default = "Pterodactyl";
         description = "The name of the panel";
       };
 
@@ -222,17 +233,22 @@ in
         description = "Path to a file containing the panel encryption key";
       };
 
-      locale = lib.mkOption {
+      timezone = lib.mkOption {
         type = lib.types.str;
-        default = "en";
-        description = "The locale for the panel";
+        default = "UTC";
+        description = "The timezone for the panel";
       };
 
       url = lib.mkOption {
         type = lib.types.str;
         description = "The URL of the panel";
       };
-      # HYTHERA: ENV Only?
+
+      environmentOnly = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "The ability to manage settings from the panel";
+      };
     };
 
     database = {
@@ -262,7 +278,7 @@ in
 
       user = lib.mkOption {
         type = lib.types.str;
-        default = "pelican-panel";
+        default = "pterodactyl-panel";
         description = "The user for the database";
       };
 
@@ -288,7 +304,7 @@ in
 
       name = lib.mkOption {
         type = lib.types.str;
-        default = "pelican-panel";
+        default = "pterodactyl-panel";
         description = "The name of the Redis server to create";
       };
 
@@ -317,30 +333,10 @@ in
       };
     };
 
-    security = {
-      disable_initial_admin_creation = lib.mkOption {
-        description = "Disable creation of admin user on first start of Pelican";
-        default = false;
-        type = lib.types.bool;
-      };
-
-      password = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        default = null;
-        description = "The password for the admin account";
-      };
-
-      passwordFile = lib.mkOption {
-        type = lib.types.nullOr lib.types.path;
-        default = null;
-        description = "Path to a file containing the admin password";
-      };
-    };
-
-    cacheStore = lib.mkOption {
+    cacheDriver = lib.mkOption {
       type = lib.types.str;
       default = "redis";
-      description = "The store for the cache";
+      description = "The driver for the cache";
     };
 
     queueConnection = lib.mkOption {
@@ -353,6 +349,26 @@ in
       type = lib.types.str;
       default = "redis";
       description = "The driver for the session";
+    };
+
+    hashids = {
+      salt = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "The salt for the hash";
+      };
+
+      saltFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.path;
+        default = null;
+        description = "Path to a file containing the hash salt";
+      };
+
+      length = lib.mkOption {
+        type = lib.types.int;
+        default = 8;
+        description = "The length of the generated hash";
+      };
     };
 
     mail = {
@@ -406,7 +422,7 @@ in
 
       fromName = lib.mkOption {
         type = lib.types.str;
-        default = "Pelican Panel";
+        default = "Pterodactyl Panel";
         description = "The from name for the mail server";
       };
     };
@@ -415,6 +431,12 @@ in
       type = lib.types.listOf lib.types.str;
       default = [ ];
       description = "A list of trusted proxy IP addresses";
+    };
+
+    telemetry.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Whether to enable telemetry";
     };
 
     extraEnvironment = lib.mkOption {
@@ -434,40 +456,33 @@ in
     assertions = [
       {
         assertion = cfg.app.key == null || cfg.app.keyFile == null;
-        message = "cannot set both services.pelican.panel.app.key and services.pelican.panel.app.keyFile";
+        message = "cannot set both services.pterodactyl.panel.app.key and services.pterodactyl.panel.app.keyFile";
       }
       {
         assertion = cfg.app.key != null || cfg.app.keyFile != null;
-        message = "must set either services.pelican.panel.app.key or services.pelican.panel.app.keyFile";
+        message = "must set either services.pterodactyl.panel.app.key or services.pterodactyl.panel.app.keyFile";
       }
       {
         assertion = cfg.database.password == null || cfg.database.passwordFile == null;
-        message = "cannot set both services.pelican.panel.database.password and services.pelican.panel.database.passwordFile";
+        message = "cannot set both services.pterodactyl.panel.database.password and services.pterodactyl.panel.database.passwordFile";
       }
       {
         assertion = cfg.redis.password == null || cfg.redis.passwordFile == null;
-        message = "cannot set both services.pelican.panel.redis.password and services.pelican.panel.redis.passwordFile";
+        message = "cannot set both services.pterodactyl.panel.redis.password and services.pterodactyl.panel.redis.passwordFile";
+      }
+      {
+        assertion = cfg.hashids.salt == null || cfg.hashids.saltFile == null;
+        message = "cannot set both services.pterodactyl.panel.hashids.salt and services.pterodactyl.panel.hashids.saltFile";
+      }
+      {
+        assertion = cfg.hashids.salt != null || cfg.hashids.saltFile != null;
+        message = "must set either services.pterodactyl.panel.hashids.salt or services.pterodactyl.panel.hashids.saltFile";
       }
       {
         assertion = cfg.mail.password == null || cfg.mail.passwordFile == null;
-        message = "cannot set both services.pelican.panel.mail.password and services.pelican.panel.mail.passwordFile";
+        message = "cannot set both services.pterodactyl.panel.mail.password and services.pterodactyl.panel.mail.passwordFile";
       }
     ];
-
-    users.users = lib.mkIf (cfg.user == "pelican-panel") {
-      ${cfg.user} = {
-        isSystemUser = true;
-        group = cfg.group;
-        home = cfg.dataDir;
-        extraGroups = lib.optionals cfg.redis.createLocally [ "redis" ];
-      };
-    };
-
-    users.groups = lib.mkIf (cfg.group == "pelican-panel") {
-      "${cfg.group}" = { };
-    };
-
-    services.pelican.panel.group = lib.mkIf cfg.enableNginx (lib.mkDefault config.services.nginx.group);
 
     services.mysql = lib.optionalAttrs cfg.database.createLocally {
       enable = true;
@@ -484,30 +499,27 @@ in
     services.redis.servers."${cfg.redis.name}" = lib.mkIf cfg.redis.createLocally (
       {
         enable = true;
-        user = cfg.user;
         group = cfg.group;
       }
       // lib.optionalAttrs (cfg.redis.password != null) { requirePass = cfg.redis.password; }
       // lib.optionalAttrs (cfg.redis.passwordFile != null) { requirePassFile = cfg.redis.passwordFile; }
     );
 
-    systemd.tmpfiles.settings."10-pelican-panel" =
+    systemd.tmpfiles.settings."10-pterodactyl-panel" =
       lib.attrsets.genAttrs
         [
-          "${cfg.dataDir}/bootstrap"
-          "${cfg.dataDir}/bootstrap/cache"
-          "${cfg.dataDir}/plugins"
           "${cfg.dataDir}/storage"
           "${cfg.dataDir}/storage/app"
           "${cfg.dataDir}/storage/app/public"
           "${cfg.dataDir}/storage/app/private"
-          "${cfg.dataDir}/storage/debugbar" # HYTHERA: Remove?
+          "${cfg.dataDir}/storage/clockwork"
           "${cfg.dataDir}/storage/framework"
           "${cfg.dataDir}/storage/framework/cache"
           "${cfg.dataDir}/storage/framework/sessions"
-          "${cfg.dataDir}/storage/testing" # HYTHERA: Remove?
           "${cfg.dataDir}/storage/framework/views"
           "${cfg.dataDir}/storage/logs"
+          "${cfg.dataDir}/bootstrap"
+          "${cfg.dataDir}/bootstrap/cache"
         ]
         (n: {
           d = {
@@ -524,10 +536,10 @@ in
         };
       };
 
-    systemd.services.pelican-panel-setup = {
-      description = "Pelican Panel setup";
-      requiredBy = lib.optional cfg.enableNginx "phpfpm-pelican-panel.service";
-      before = lib.optional cfg.enableNginx "phpfpm-pelican-panel.service";
+    systemd.services.pterodactyl-panel-setup = {
+      description = "Pterodactyl Panel setup";
+      requiredBy = lib.optional cfg.enableNginx "phpfpm-pterodactyl-panel.service";
+      before = lib.optional cfg.enableNginx "phpfpm-pterodactyl-panel.service";
       after = [ "mysql.service" ];
       restartTriggers = [ cfg.package ];
 
@@ -538,40 +550,39 @@ in
       };
     };
 
-    systemd.services.pelican-queue = {
-      description = "Pelican Queue Service";
+    systemd.services.pteroq = {
+      description = "Pterodactyl Queue Worker";
       after = [
-        "pelican-panel-setup.service"
+        "pterodactyl-panel-setup.service"
         "mysql.service"
-        "redis-pelican-panel.service"
+        "redis-pterodactyl-panel.service"
       ];
-      wants = [ "pelican-panel-setup.service" ];
+      wants = [ "pterodactyl-panel-setup.service" ];
       wantedBy = [ "multi-user.target" ];
 
       serviceConfig = cfgService // {
-        ExecStart = "${cfg.phpPackage}/bin/php ${cfg.package}/artisan queue:work --tries=3"; # HYTHERA: Use original?
+        ExecStart = "${cfg.phpPackage}/bin/php ${cfg.package}/artisan queue:work --queue=high,standard,low --sleep=3 --tries=3";
         Restart = "always";
       };
     };
 
-    systemd.services.pelican-panel-cron = {
-      description = "Pelican Panel cron job";
+    systemd.services.pterodactyl-panel-cron = {
+      description = "Pterodactyl Panel cron job";
       after = [
-        "pelican-panel-setup.service"
+        "pterodactyl-panel-setup.service"
         "mysql.service"
-        "redis-pelican.service"
+        "redis-pterodactyl-panel.service"
       ];
-      wants = [ "pelican-panel-setup.service" ];
+      wants = [ "pterodactyl-panel-setup.service" ];
 
       serviceConfig = cfgService // {
         Type = "oneshot";
         ExecStart = "${cfg.phpPackage}/bin/php ${cfg.package}/artisan schedule:run";
-        #ExecStart = "php ${cfg.package}/artisan schedule:run";
       };
     };
 
-    systemd.timers.pelican-panel-cron = {
-      description = "Pelican Panel cron timer";
+    systemd.timers.pterodactyl-panel-cron = {
+      description = "Pterodactyl Panel cron timer";
       wantedBy = [ "timers.target" ];
       restartTriggers = [ cfg.package ];
 
@@ -581,7 +592,7 @@ in
       };
     };
 
-    services.phpfpm.pools.pelican-panel = lib.mkIf cfg.enableNginx {
+    services.phpfpm.pools.pterodactyl-panel = lib.mkIf cfg.enableNginx {
       user = cfg.user;
       group = cfg.group;
       phpPackage = cfg.phpPackage;
@@ -596,8 +607,8 @@ in
       };
     };
 
-    systemd.services."phpfpm-pelican-panel" = lib.mkIf cfg.enableNginx {
-      requires = [ "pelican-panel-setup.service" ];
+    systemd.services."phpfpm-pterodactyl-panel" = lib.mkIf cfg.enableNginx {
+      requires = [ "pterodactyl-panel-setup.service" ];
     };
 
     services.nginx = lib.mkIf cfg.enableNginx {
@@ -624,7 +635,7 @@ in
           "~ \\.php$" = {
             extraConfig = ''
               fastcgi_split_path_info ^(.+\.php)(/.+)$;
-              fastcgi_pass unix:${config.services.phpfpm.pools.pelican-panel.socket};
+              fastcgi_pass unix:${config.services.phpfpm.pools.pterodactyl-panel.socket};
               fastcgi_index index.php;
               fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
               fastcgi_param HTTP_PROXY "";
@@ -641,6 +652,23 @@ in
       };
     };
 
-    environment.systemPackages = [ pelicanCli ];
+    environment.systemPackages = [ pterodactylCli ];
+
+    services.pterodactyl.panel.group = lib.mkIf cfg.enableNginx (
+      lib.mkDefault config.services.nginx.group
+    );
+
+    users.users = lib.mkIf (cfg.user == "pterodactyl-panel") {
+      ${cfg.user} = {
+        isSystemUser = true;
+        group = cfg.group;
+        home = cfg.dataDir;
+        extraGroups = lib.optionals cfg.redis.createLocally [ "redis" ];
+      };
+    };
+
+    users.groups = lib.mkIf (cfg.group == "pterodactyl-panel") {
+      ${cfg.group} = { };
+    };
   };
 }

@@ -1,0 +1,4 @@
+ SQLSTATE[42S02]: Base table or view not found: 1146 Table 'panel.game_queries' doesn't exist (Connection: mariadb, SQL: select count(*) as aggregate from `game_queries`) 
+ (View: /nix/store/5avm0w071p3k8s8gwvjxp6mdxnyg25bj-pelican-panel-1.0.0-beta30/vendor/filament/filament/resources/views/livewire/sidebar.blade.php) 
+ (View: /nix/store/5avm0w071p3k8s8gwvjxp6mdxnyg25bj-pelican-panel-1.0.0-beta30/vendor/filament/filament/resources/views/livewire/sidebar.blade.php) 
+ (View: /nix/store/5avm0w071p3k8s8gwvjxp6mdxnyg25bj-pelican-panel-1.0.0-beta30/vendor/filament/filament/resources/views/livewire/sidebar.blade.php) 
