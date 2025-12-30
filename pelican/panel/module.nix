@@ -114,7 +114,7 @@ let
     User = cfg.user;
     Group = cfg.group;
     WorkingDirectory = cfg.package;
-    StateDirectory = "pelican-panel";
+    StateDirectory = lib.removePrefix "/var/lib/" cfg.dataDir;
     ReadWritePaths = [ cfg.dataDir ];
   };
 in

@@ -79,9 +79,10 @@ let
   cfgService = {
     User = cfg.user;
     Group = cfg.group;
-    StateDirectory = "pelican-wings";
-    LogsDirectory = "pelican-wings";
-    CacheDirectory = "pelican-wings";
+    StateDirectory = lib.removePrefix "/var/lib/" cfg.rootDir;
+    LogsDirectory = lib.removePrefix "/var/log/" cfg.logDir;
+    CacheDirectory = lib.removePrefix "/var/cache/" cfg.tmpDir;
+    RuntimeDirectory = lib.removePrefix "/run/" cfg.runDir;
     ReadWritePaths = [
       cfg.rootDir
       cfg.logDir
@@ -332,7 +333,6 @@ in
           "${cfg.rootDir}/volumes/.sftp"
           "${cfg.rootDir}/archives"
           "${cfg.rootDir}/backups"
-          "${cfg.runDir}"
         ]
         (n: {
           d = {
@@ -356,6 +356,22 @@ in
           user = cfg.user;
           group = cfg.group;
           mode = "0644";
+        };
+        "${cfg.runDir}".d = {
+          user = cfg.user;
+          group = cfg.group;
+          mode = "0755";
+        };
+
+        "${cfg.logDir}".d = {
+          user = cfg.user;
+          group = cfg.group;
+          mode = "0755";
+        };
+        "${cfg.tmpDir}".d = {
+          user = cfg.user;
+          group = cfg.group;
+          mode = "0755";
         };
       };
 
