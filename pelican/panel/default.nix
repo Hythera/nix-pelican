@@ -10,13 +10,13 @@
 }:
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "pelican-panel";
-  version = "1.0.0-beta30";
+  version = "1.0.0-beta31";
 
   src = fetchFromGitHub {
     owner = "pelican-dev";
     repo = "panel";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-UoBnwCHxZ4Mp5ASvDv8a0Biw5Bzzb4hxWfrq1xC8k+4=";
+    hash = "sha256-3cLx18u6xo8qPERZW33AyGeCiIX+vPWrs/d22HwZ7is=";
   };
 
   buildInputs = [ php84 ];
@@ -34,7 +34,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     composerNoScripts = true;
     composerStrictValidation = true;
     strictDeps = true;
-    vendorHash = "sha256-kbiCRoGaKGQnUB8xjOZCSGYhYgksF1S/iA0K4plemck=";
+    vendorHash = "sha256-C2KEUnaaEOpZcBDaFPr1eqZ/koHZM6CnHVZGtUnfksU=";
   };
 
   offlineCache = fetchYarnDeps {
