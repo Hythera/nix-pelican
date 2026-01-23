@@ -494,6 +494,7 @@ in
         [
           "${cfg.dataDir}/bootstrap"
           "${cfg.dataDir}/bootstrap/cache"
+          "${cfg.dataDir}/plugins"
           "${cfg.dataDir}/storage"
           "${cfg.dataDir}/storage/app"
           "${cfg.dataDir}/storage/app/public"
