@@ -4,6 +4,7 @@
   lib,
   nodejs,
   php84,
+  php84Packages,
   stdenvNoCC,
   yarnConfigHook,
   dataDir ? "/var/lib/pelican-panel", # HYTHERA: Fix proper variable?
@@ -24,6 +25,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     nodejs
     php84.composerHooks2.composerInstallHook
+    php84Packages.composer
     yarnConfigHook
   ];
 
@@ -34,7 +36,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     composerNoScripts = true;
     composerStrictValidation = true;
     strictDeps = true;
-    vendorHash = "sha256-C2KEUnaaEOpZcBDaFPr1eqZ/koHZM6CnHVZGtUnfksU=";
+    vendorHash = "sha256-e9L0wUsfGQpJ109yST9vBFyaxMC5v5emU2rE9pKWeuo=";
   };
 
   offlineCache = fetchYarnDeps {
