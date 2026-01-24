@@ -1,5 +1,5 @@
 > [!Note]
-> Pelican Nix is in a very early stage. Because of this, things might break. You can help making it better and improving its functionality by submitting issues or pull requests.
+> Nix Pelican is in a very early stage. Because of this, things might break. You can help making it better and improving its functionality by submitting issues or pull requests.
 
 ## How to's
 
@@ -18,7 +18,7 @@ nix build .#pelican.wings
 
 0. Set up a local version of Nix Pelican to work with:
    1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo#forking-a-repository) the [Nix Pelican repository](https://github.com/Hythera/nix-pelican).
-   1. [Clone the forked repository](https://docs.github.com/en/get-started/quickstart/fork-a-repo#cloning-your-forked-repository) into a local `pelican-nix` directory.
+   1. [Clone the forked repository](https://docs.github.com/en/get-started/quickstart/fork-a-repo#cloning-your-forked-repository) into a local `nix-pelican` directory.
    1. [Configure the upstream Nix Pelican repository](https://docs.github.com/en/get-started/quickstart/fork-a-repo#configuring-git-to-sync-your-fork-with-the-upstream-repository).
 
 1. Select the appropriate [base branch](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches#working-with-branches) for the change, as [described here][branch].
@@ -57,7 +57,7 @@ nix build .#pelican.wings
    The above command will output a link to directly do the next step:
    ```
    remote: Create a pull request for 'update-hello' on GitHub by visiting:
-   remote:      https://github.com/myUser/pelican-nix/pull/new/update-hello
+   remote:      https://github.com/myUser/nix-pelican/pull/new/update-hello
    ```
 
 6. [Create a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request#creating-the-pull-request) from the new branch in your Nix Pelican fork to the upstream Nix Pelican repository.
