@@ -54,7 +54,6 @@ The default way of installing Pelican, is by using this flake as the input for y
       };
     }
 }
-
 ```
 
 To use the module, you also have to configure it in your configuration.
@@ -110,4 +109,29 @@ The command above might fail because of `[1698] Access denied for user 'pelican-
 ```sh
 # runs the same command as pelican-panel user
 sudo -u pelican-panel pelican-cli p:user:make
+```
+
+## Troubleshooting
+
+If you encounter any issues during or after the installation, here is a small list of things you can try to fix them. If the issue still persists, you can open a [new issue](https://github.com/Hythera/nix-pelican/issues/new) with your specific problem.
+
+### Nodes Not Loading / Weird Panel Behavior
+
+The nodes might not automatically load after setting them up. Alternatively, sometimes the panel shows error code 500 after installation. This is usually caused by the cache not being up to date. To fix this, you can try clearing the cache, which should resolve most of the common issues.
+
+```sh
+# clears the panel cache
+sudo pelican-cli cache:clear
+
+# clears the panel config cache
+sudo pelican-cli config:clear
+```
+
+### 502 Bad Gateway 
+
+Gateway issues are mostly caused by the `phpfpm-pelican-panel` service not starting up correctly. It's most commonly fixed by restarting the serivce.
+
+```sh
+# restarts the phpfpm-pelican-panel services
+sudo systemctl restart phpfpm-pelican-panel.service
 ```
