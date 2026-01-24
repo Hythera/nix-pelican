@@ -1,0 +1,18 @@
+name: "Question"
+description: "Ask a question related to this project."
+title: "question: QUESTIONNAME"
+labels: ["0.kind: question"]
+body:
+  - type: "markdown"
+    attributes:
+      value: |
+        Welcome to Nix Pelican. Please replace the **`question: QUESTIONNAME`** template above with a short summary of your question.
+
+         ---
+  - type: "textarea"
+    id: "description"
+    attributes:
+      label: "Describe your question"
+      description: "You can ask almost anything, but please try to stay on topic."
+    validations:
+      required: true
