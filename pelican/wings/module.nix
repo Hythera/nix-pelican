@@ -11,7 +11,7 @@ let
     debug = cfg.debug;
     app_name = cfg.appName;
     uuid = cfg.uuid;
-    token_id = if cfg.tokenIdFile != null then "@TOKNE_ID@" else cfg.tokenId;
+    token_id = if cfg.tokenIdFile != null then "@TOKEN_ID@" else cfg.tokenId;
     token = if cfg.tokenFile != null then "@TOKEN@" else cfg.token;
     api = {
       host = cfg.api.host;
@@ -35,7 +35,14 @@ let
       user = {
         uid = config.users.users.${cfg.user}.uid;
         gid = config.users.groups.${cfg.group}.gid;
-        passwd_file = "${cfg.runDir}/passwd";
+        passwd = {
+          enable = true;
+          directory = "${cfg.runDir}/passwd";
+        };
+      };
+      machine_id = {
+        enable = true;
+        directory = "${cfg.runDir}/machine-id";
       };
       sftp = {
         bind_address = cfg.system.sftp.host;
@@ -79,9 +86,9 @@ let
   cfgService = {
     User = cfg.user;
     Group = cfg.group;
-    StateDirectory = "pelican-wings";
-    LogsDirectory = "pelican-wings";
-    CacheDirectory = "pelican-wings";
+    StateDirectory = lib.removePrefix "/var/lib/" cfg.rootDir;
+    LogsDirectory = lib.removePrefix "/var/log/" cfg.logDir;
+    CacheDirectory = lib.removePrefix "/var/cache/" cfg.tmpDir;
     ReadWritePaths = [
       cfg.rootDir
       cfg.logDir
@@ -328,11 +335,11 @@ in
     systemd.tmpfiles.settings."10-pelican-wings" =
       lib.attrsets.genAttrs
         [
+          "${cfg.rootDir}/machine-id"
           "${cfg.rootDir}/volumes"
           "${cfg.rootDir}/volumes/.sftp"
           "${cfg.rootDir}/archives"
           "${cfg.rootDir}/backups"
-          "${cfg.runDir}"
         ]
         (n: {
           d = {
@@ -356,6 +363,22 @@ in
           user = cfg.user;
           group = cfg.group;
           mode = "0644";
+        };
+        "${cfg.runDir}".d = {
+          user = cfg.user;
+          group = cfg.group;
+          mode = "0755";
+        };
+
+        "${cfg.logDir}".d = {
+          user = cfg.user;
+          group = cfg.group;
+          mode = "0755";
+        };
+        "${cfg.tmpDir}".d = {
+          user = cfg.user;
+          group = cfg.group;
+          mode = "0755";
         };
       };
 

@@ -4,19 +4,20 @@
   lib,
   nodejs,
   php84,
+  php84Packages,
   stdenvNoCC,
   yarnConfigHook,
   dataDir ? "/var/lib/pelican-panel", # HYTHERA: Fix proper variable?
 }:
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "pelican-panel";
-  version = "1.0.0-beta30";
+  version = "1.0.0-beta31";
 
   src = fetchFromGitHub {
     owner = "pelican-dev";
     repo = "panel";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-UoBnwCHxZ4Mp5ASvDv8a0Biw5Bzzb4hxWfrq1xC8k+4=";
+    hash = "sha256-3cLx18u6xo8qPERZW33AyGeCiIX+vPWrs/d22HwZ7is=";
   };
 
   buildInputs = [ php84 ];
@@ -24,6 +25,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     nodejs
     php84.composerHooks2.composerInstallHook
+    php84Packages.composer
     yarnConfigHook
   ];
 
@@ -34,7 +36,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     composerNoScripts = true;
     composerStrictValidation = true;
     strictDeps = true;
-    vendorHash = "sha256-kbiCRoGaKGQnUB8xjOZCSGYhYgksF1S/iA0K4plemck=";
+    vendorHash = "sha256-e9L0wUsfGQpJ109yST9vBFyaxMC5v5emU2rE9pKWeuo=";
   };
 
   offlineCache = fetchYarnDeps {
@@ -52,7 +54,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     chmod -R u+w $out/share
     mv $out/share/php/pelican-panel/* $out/
 
-    rm -rf $out/share $out/storage $out/bootstrap/cache
+    rm -rf $out/share $out/plugins $out/storage $out/bootstrap/cache
     ln -s ${dataDir}/.env $out/.env
     ln -s ${dataDir}/plugins $out/plugins
     ln -s ${dataDir}/bootstrap/cache $out/bootstrap/cache

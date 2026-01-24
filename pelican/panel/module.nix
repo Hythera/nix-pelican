@@ -113,7 +113,7 @@ let
     User = cfg.user;
     Group = cfg.group;
     WorkingDirectory = cfg.package;
-    StateDirectory = "pelican-panel";
+    StateDirectory = lib.removePrefix "/var/lib/" cfg.dataDir;
     ReadWritePaths = [ cfg.dataDir ];
   };
 in
@@ -483,6 +483,7 @@ in
     services.redis.servers."${cfg.redis.name}" = lib.mkIf cfg.redis.createLocally (
       {
         enable = true;
+        user = cfg.user;
         group = cfg.group;
       }
       // lib.optionalAttrs (cfg.redis.password != null) { requirePass = cfg.redis.password; }
@@ -494,6 +495,7 @@ in
         [
           "${cfg.dataDir}/bootstrap"
           "${cfg.dataDir}/bootstrap/cache"
+          "${cfg.dataDir}/plugins"
           "${cfg.dataDir}/storage"
           "${cfg.dataDir}/storage/app"
           "${cfg.dataDir}/storage/app/public"
@@ -637,8 +639,6 @@ in
         };
       };
     };
-
-    networking.firewall.allowedTCPPorts = [ 80 ];
 
     environment.systemPackages = [ pelicanCli ];
   };
