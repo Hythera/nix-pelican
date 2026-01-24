@@ -25,7 +25,7 @@ Pelican is an open-source game server management tool, forked from Pterodactyl. 
 
 Pelican should work on all operating systems, as the frontend uses PHP and the backend uses Docker. It is mostly recommendet though, to run Pelican on either `x86_64-linux` or `aarch64-linux`.
 
-### Default installation
+### Default Installation
 
 The default way of installing Pelican, is by using this flake as the input for your flake and adding the module to your configuration.
 
@@ -94,3 +94,20 @@ To use the module, you also have to configure it in your configuration.
 
   virtualisation.docker.enable = true;
 }
+```
+
+### User Creation
+
+The panel won't have a default admin user after the installation. Because of that, you have to use the provided  **pelican-cli** to create it. The **pelican-cli** is a wrapper for running the artisan commands. A list of them can be found [here](https://pelican.dev/docs/panel/advanced/artisan).
+
+```sh
+# creates the default admin user
+sudo pelican-cli p:user:make
+```
+
+The command above might fail because of `[1698] Access denied for user 'pelican-panel'@'localhost'`, if you have the panel database on the same machine. That's because `localhost` uses the **unix socket** for authentication instead of **tcp**. To fix this, you have to run the command as your database user, by default `pelican-panel`.
+
+```sh
+# runs the same command as pelican-panel user
+sudo -u pelican-panel pelican-cli p:user:make
+```
