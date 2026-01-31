@@ -7,6 +7,8 @@
 let
   cfg = config.services.pelican.panel;
 
+  panel-package = cfg.package.override { dataDir = cfg.dataDir; };
+
   env =
     (lib.filterAttrs (n: v: v != null) {
       APP_NAME = cfg.app.name;
@@ -95,8 +97,8 @@ let
         cat ${lib.escapeShellArg cfg.extraEnvironmentFile} >> ${cfg.dataDir}/.env
       ''}
 
-      php ${cfg.package}/artisan migrate --seed --force
-      php ${cfg.package}/artisan optimize:clear
+      php ${panel-package}/artisan migrate --seed --force
+      php ${panel-package}/artisan optimize:clear
     '';
   };
 
@@ -105,14 +107,14 @@ let
     runtimeInputs = [ cfg.phpPackage ];
     text = ''
       cd ${cfg.dataDir}
-      php ${cfg.package}/artisan "$@"
+      php ${panel-package}/artisan "$@"
     '';
   };
 
   cfgService = {
     User = cfg.user;
     Group = cfg.group;
-    WorkingDirectory = cfg.package;
+    WorkingDirectory = panel-package;
     StateDirectory = lib.removePrefix "/var/lib/" cfg.dataDir;
     ReadWritePaths = [ cfg.dataDir ];
   };
@@ -525,7 +527,7 @@ in
       requiredBy = lib.optional cfg.enableNginx "phpfpm-pelican-panel.service";
       before = lib.optional cfg.enableNginx "phpfpm-pelican-panel.service";
       after = [ "mysql.service" ];
-      restartTriggers = [ cfg.package ];
+      restartTriggers = [ panel-package ];
 
       serviceConfig = cfgService // {
         Type = "oneshot";
@@ -545,7 +547,7 @@ in
       wantedBy = [ "multi-user.target" ];
 
       serviceConfig = cfgService // {
-        ExecStart = "${cfg.phpPackage}/bin/php ${cfg.package}/artisan queue:work --tries=3";
+        ExecStart = "${cfg.phpPackage}/bin/php ${panel-package}/artisan queue:work --tries=3";
         Restart = "always";
       };
     };
@@ -561,14 +563,14 @@ in
 
       serviceConfig = cfgService // {
         Type = "oneshot";
-        ExecStart = "${cfg.phpPackage}/bin/php ${cfg.package}/artisan schedule:run";
+        ExecStart = "${cfg.phpPackage}/bin/php ${panel-package}/artisan schedule:run";
       };
     };
 
     systemd.timers.pelican-panel-cron = {
       description = "Pelican Panel cron timer";
       wantedBy = [ "timers.target" ];
-      restartTriggers = [ cfg.package ];
+      restartTriggers = [ panel-package ];
 
       timerConfig = {
         OnCalendar = "minutely";
@@ -601,7 +603,7 @@ in
       recommendedOptimisation = lib.mkDefault true;
       recommendedGzipSettings = lib.mkDefault true;
       virtualHosts."${builtins.replaceStrings [ "https://" "http://" ] [ "" "" ] cfg.app.url}" = {
-        root = "${cfg.package}/public";
+        root = "${panel-package}/public";
         extraConfig = ''
           index index.php;
           client_max_body_size 100m;
