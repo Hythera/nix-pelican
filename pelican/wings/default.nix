@@ -23,11 +23,11 @@ buildGoModule (finalAttrs: {
   ];
 
   meta = {
-    description = "Free game server control panel backend offering high flying security"; # HYTHERA: To be changed?
+    description = "Game server control panel backend offering high flying security";
     changelog = "https://github.com/pelican-dev/wings/releases/tag/v${finalAttrs.version}";
     homepage = "https://pelican.dev";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ hythera ];
-    platforms = lib.platforms.all;
+    platforms = lib.platforms.linux;
   };
 })

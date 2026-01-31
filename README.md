@@ -19,7 +19,7 @@
 
 ## What is Nix Pelican?
 
-Pelican is an open-source game server management tool, forked from Pterodactyl. This module brings this panel to Nix by implementing its own module for both frontend and backend service. This build is heavily based off of [PadowYT2's Implementation](https://github.com/PadowYT2/pterodactyl.nix), so be sure to check him and his work out.
+Pelican is an open-source game server management tool, forked from Pterodactyl. This module brings this panel to Nix by implementing its own module for both frontend and backend service. This build is heavily based off of [PadowYT2's Implementation](https://github.com/PadowYT2/pterodactyl.nix) of Pterodactyl, so be sure to check him and his work out.
 
 ## Install
 

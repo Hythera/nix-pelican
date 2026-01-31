@@ -7,7 +7,7 @@
   php84Packages,
   stdenvNoCC,
   yarnConfigHook,
-  dataDir ? "/var/lib/pelican-panel", # HYTHERA: Fix proper variable?
+  dataDir ? "/var/lib/pelican-panel",
 }:
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "pelican-panel";
@@ -64,10 +64,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   '';
 
   meta = {
-    description = "Free game server control panel offering high flying security";
+    description = "Game server control panel offering high flying security";
     changelog = "https://github.com/pelican-dev/panel/releases/tag/v${finalAttrs.version}";
     homepage = "https://pelican.dev";
-    license = lib.licenses.agpl3Plus; # HYTHERA: To be checked?
+    license = lib.licenses.agpl3Only;
     maintainers = with lib.maintainers; [ hythera ];
     platforms = lib.platforms.all;
   };

@@ -21,15 +21,10 @@ nix build .#pelican.wings
    1. [Clone the forked repository](https://docs.github.com/en/get-started/quickstart/fork-a-repo#cloning-your-forked-repository) into a local `nix-pelican` directory.
    1. [Configure the upstream Nix Pelican repository](https://docs.github.com/en/get-started/quickstart/fork-a-repo#configuring-git-to-sync-your-fork-with-the-upstream-repository).
 
-1. Select the appropriate [base branch](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches#working-with-branches) for the change, as [described here][branch].
-   If in doubt, use `master`.
-   This can be changed later by [rebasing][rebase].
-
-2. Create a new Git branch, ideally such that:
+1. Create a new Git branch, ideally such that:
    - The name of the branch hints at your change, e.g. `update-hello`.
    - The branch contains the most recent base branch.
 
-   We'll assume the base branch `master` here.
 
    ```bash
    # Make sure you have the latest changes from upstream Nix Pelican
@@ -39,17 +34,17 @@ nix build .#pelican.wings
    git switch --create update-hello upstream/master
    ```
 
-3. Make your changes in the local Nix Pelican repository and:
+2. Make your changes in the local Nix Pelican repository and:
    - Test the changes.
    - If necessary, document the changes.
 
-4. Commit your changes using `git commit`.
+3. Commit your changes using `git commit`.
 
    Repeat the steps 3-4 as many times as necessary.
    Advance to the next step once all the commits make sense together.
    You can view your commits with `git log`.
 
-5. Push your commits to your fork of Nix Pelican:
+4. Push your commits to your fork of Nix Pelican:
    ```
    git push --set-upstream origin HEAD
    ```
@@ -60,11 +55,10 @@ nix build .#pelican.wings
    remote:      https://github.com/myUser/nix-pelican/pull/new/update-hello
    ```
 
-6. [Create a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request#creating-the-pull-request) from the new branch in your Nix Pelican fork to the upstream Nix Pelican repository.
-   Use the branch from step 1 as the PR's base branch.
+5. [Create a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request#creating-the-pull-request) from the new branch in your Nix Pelican fork to the upstream Nix Pelican repository.
 
 
-7. Respond to review comments and potentially to CI failures and merge conflicts by updating the PR.
+6. Respond to review comments and potentially to CI failures and merge conflicts by updating the PR.
    Always keep it in a mergeable state.
 
 
