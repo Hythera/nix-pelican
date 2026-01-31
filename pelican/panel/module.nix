@@ -97,7 +97,7 @@ let
 
       php ${cfg.package}/artisan migrate --seed --force
       php ${cfg.package}/artisan optimize:clear
-    ''; # HYTHERA: Fix cd?
+    '';
   };
 
   pelicanCli = pkgs.writeShellApplication {
@@ -106,7 +106,7 @@ let
     text = ''
       cd ${cfg.dataDir}
       php ${cfg.package}/artisan "$@"
-    ''; # HYTHERA: Fix?
+    '';
   };
 
   cfgService = {
@@ -231,7 +231,6 @@ in
         type = lib.types.str;
         description = "The URL of the panel";
       };
-      # HYTHERA: ENV Only?
     };
 
     database = {
@@ -500,11 +499,9 @@ in
           "${cfg.dataDir}/storage/app"
           "${cfg.dataDir}/storage/app/public"
           "${cfg.dataDir}/storage/app/private"
-          "${cfg.dataDir}/storage/debugbar" # HYTHERA: Remove?
           "${cfg.dataDir}/storage/framework"
           "${cfg.dataDir}/storage/framework/cache"
           "${cfg.dataDir}/storage/framework/sessions"
-          "${cfg.dataDir}/storage/testing" # HYTHERA: Remove?
           "${cfg.dataDir}/storage/framework/views"
           "${cfg.dataDir}/storage/logs"
         ]
@@ -548,7 +545,7 @@ in
       wantedBy = [ "multi-user.target" ];
 
       serviceConfig = cfgService // {
-        ExecStart = "${cfg.phpPackage}/bin/php ${cfg.package}/artisan queue:work --tries=3"; # HYTHERA: Use original?
+        ExecStart = "${cfg.phpPackage}/bin/php ${cfg.package}/artisan queue:work --tries=3";
         Restart = "always";
       };
     };
@@ -565,7 +562,6 @@ in
       serviceConfig = cfgService // {
         Type = "oneshot";
         ExecStart = "${cfg.phpPackage}/bin/php ${cfg.package}/artisan schedule:run";
-        #ExecStart = "php ${cfg.package}/artisan schedule:run";
       };
     };
 
