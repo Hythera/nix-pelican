@@ -1,42 +1,57 @@
 {
   fetchFromGitHub,
+  fetchpatch,
   fetchYarnDeps,
   lib,
   nodejs,
-  php84,
-  php84Packages,
+  php85,
+  php85Packages,
   stdenvNoCC,
   yarnConfigHook,
   dataDir ? "/var/lib/pelican-panel",
 }:
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "pelican-panel";
-  version = "1.0.0-beta31";
+  version = "1.0.0-beta32";
 
   src = fetchFromGitHub {
     owner = "pelican-dev";
     repo = "panel";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-3cLx18u6xo8qPERZW33AyGeCiIX+vPWrs/d22HwZ7is=";
+    hash = "sha256-BnxoM9C2+aCZuzzeWiiCBnBHXZx/01gaPO9eV3wFIZI=";
   };
 
-  buildInputs = [ php84 ];
+  # Implements https://github.com/pelican-dev/panel/pull/2209
+  patches = [
+    (fetchpatch {
+      hash = "sha256-lWbRgdpkp6BOLEW+LIz6p9m58gi0JK8zmxjqiO+j7BY=";
+      name = "fix-composer-content-hash";
+      url = "https://github.com/pelican-dev/panel/commit/c49eef3ab7b46a3a40a0a56a95cc1017575ac362.patch";
+    })
+  ];
+
+  buildInputs = [ php85 ];
 
   nativeBuildInputs = [
     nodejs
-    php84.composerHooks2.composerInstallHook
-    php84Packages.composer
+    php85.composerHooks2.composerInstallHook
+    php85Packages.composer
     yarnConfigHook
   ];
 
-  composerVendor = php84.mkComposerVendor {
-    inherit (finalAttrs) pname src version;
+  composerVendor = php85.mkComposerVendor {
+    inherit (finalAttrs)
+      patches
+      pname
+      src
+      version
+      ;
     composerNoDev = true;
     composerNoPlugins = true;
     composerNoScripts = true;
     composerStrictValidation = true;
     strictDeps = true;
-    vendorHash = "sha256-e9L0wUsfGQpJ109yST9vBFyaxMC5v5emU2rE9pKWeuo=";
+    vendorHash = "sha256-04SjYnoV6Xb8eN5GZXZHiBHtcywT1c40CRvv6HNjcvM=";
   };
 
   offlineCache = fetchYarnDeps {
