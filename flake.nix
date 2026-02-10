@@ -21,10 +21,8 @@
       };
 
       overlays.default = final: prev: {
-        pelican = {
-          panel = prev.callPackage ./pelican/panel/default.nix { };
-          wings = prev.callPackage ./pelican/wings/default.nix { };
-        };
+        pelican-panel = prev.callPackage ./pelican/panel/default.nix { };
+        pelican-wings = prev.callPackage ./pelican/wings/default.nix { };
       };
     }
     // (inputs.flake-utils.lib.eachDefaultSystem (
@@ -37,7 +35,8 @@
       in
       {
         packages = {
-          pelican = pkgs.pelican;
+          pelican-panel = pkgs.pelican-panel;
+          pelican-wings = pkgs.pelican-wings;
         };
       }
     ));
