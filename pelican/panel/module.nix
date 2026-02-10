@@ -532,6 +532,10 @@ in
       serviceConfig = cfgService // {
         Type = "oneshot";
         ExecStart = lib.getExe setupScript;
+        ExecStartPost = [
+          "${cfg.phpPackage}/bin/php ${panel-package}/artisan cache:clear"
+          "${cfg.phpPackage}/bin/php ${panel-package}/artisan config:clear"
+        ];
         RemainAfterExit = true;
       };
     };
