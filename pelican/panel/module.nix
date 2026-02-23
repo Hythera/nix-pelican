@@ -47,7 +47,7 @@ let
       MAIL_PORT = cfg.mail.port;
       MAIL_USERNAME = cfg.mail.username;
       MAIL_ENCRYPTION = cfg.mail.encryption;
-      MAIL_FROM_ADRESS = cfg.mail.fromAddress;
+      MAIL_FROM_ADDRESS = cfg.mail.fromAddress;
       MAIL_FROM_NAME = cfg.mail.fromName;
 
       TRUSTED_PROXIES = builtins.concatStringsSep "," cfg.trustedProxies;
