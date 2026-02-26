@@ -46,6 +46,7 @@ let
       MAIL_HOST = cfg.mail.host;
       MAIL_PORT = cfg.mail.port;
       MAIL_USERNAME = cfg.mail.username;
+      MAIL_PASSWORD = if cfg.mail.passwordFile != null then "@MAIL_PASSWORD@" else cfg.mail.password;
       MAIL_ENCRYPTION = cfg.mail.encryption;
       MAIL_FROM_ADDRESS = cfg.mail.fromAddress;
       MAIL_FROM_NAME = cfg.mail.fromName;
