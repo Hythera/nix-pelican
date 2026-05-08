@@ -1,0 +1,25 @@
+
+From fcc5943bcc8fba724ee67d70ee757a456844e8d6 Mon Sep 17 00:00:00 2001
+From: Hythera <87016780+Hythera@users.noreply.github.com>
+Date: Fri, 8 May 2026 15:42:53 +0200
+Subject: [PATCH] fix: composer content hash
+
+---
+ composer.lock | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/composer.lock b/composer.lock
+index c823deb58..c21a1d3dd 100644
+--- a/composer.lock
++++ b/composer.lock
+@@ -4,7 +4,7 @@
+         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+         "This file is @generated automatically"
+     ],
+-    "content-hash": "3ec4cdaa058200cf4a9390823585b105",
++    "content-hash": "e4c50b5f20843cb6f3ecbf69d3a06f30",
+     "packages": [
+         {
+             "name": "aws/aws-crt-php",
+-- 
+2.53.0

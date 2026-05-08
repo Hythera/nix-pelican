@@ -1,6 +1,5 @@
 {
   fetchFromGitHub,
-  fetchpatch,
   fetchYarnDeps,
   lib,
   nodejs,
@@ -12,14 +11,19 @@
 }:
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "pelican-panel";
-  version = "1.0.0-beta33";
+  version = "1.0.0-beta34";
 
   src = fetchFromGitHub {
     owner = "pelican-dev";
     repo = "panel";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-+nP6J+ZdtWtR4bo8DQkvnS5jVbjvxITnWvwkR+izOYY=";
+    hash = "sha256-apqExVgE3E+hL59oR5BWCfBPisyJ+5weCktGqmp2PRw=";
   };
+
+  patches = [
+    # https://github.com/pelican-dev/panel/pull/2324
+    ./0001-fix-composer-content-hash.patch
+  ];
 
   buildInputs = [ php85 ];
 
@@ -32,6 +36,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   composerVendor = php85.mkComposerVendor {
     inherit (finalAttrs)
+      patches
       pname
       src
       version
@@ -41,7 +46,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     composerNoScripts = true;
     composerStrictValidation = true;
     strictDeps = true;
-    vendorHash = "sha256-oBTmBlm31/AjPB0C0vgA94+6WMPG+IBMql3a2H+SjfQ=";
+    vendorHash = "sha256-rXZlJ429AGwD3aBDIeLh12HJeT2ezky8kmpkllWJXQM=";
   };
 
   offlineCache = fetchYarnDeps {
