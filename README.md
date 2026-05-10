@@ -4,7 +4,7 @@
 <h1 align="center">Nix Pelican</h1>
 
 <p align="center">
-<a href="https://github.com/pelican-dev/panel/releases" target="_blank"><img src="https://img.shields.io/badge/version-1.0.0_beta33-blue" /></a>
+<a href="https://github.com/pelican-dev/panel/releases" target="_blank"><img src="https://img.shields.io/badge/version-1.0.0_beta34-blue" /></a>
 <a href="https://github.com/Hythera/nix-pelican/stargazers" target="_blank"><img src="https://img.shields.io/github/stars/Hythera/nix-pelican" alt="stars"></a>
 </p>
 
