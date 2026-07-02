@@ -11,19 +11,14 @@
 }:
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "pelican-panel";
-  version = "1.0.0-beta34";
+  version = "1.0.0-beta35";
 
   src = fetchFromGitHub {
     owner = "pelican-dev";
     repo = "panel";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-apqExVgE3E+hL59oR5BWCfBPisyJ+5weCktGqmp2PRw=";
+    hash = "sha256-SNYivBbCHt8aOGOK+/AXKNuc5OSozWMRDnIIH3ylu/8=";
   };
-
-  patches = [
-    # https://github.com/pelican-dev/panel/pull/2324
-    ./0001-fix-composer-content-hash.patch
-  ];
 
   buildInputs = [ php85 ];
 
@@ -36,7 +31,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   composerVendor = php85.mkComposerVendor {
     inherit (finalAttrs)
-      patches
       pname
       src
       version
@@ -46,12 +40,12 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     composerNoScripts = true;
     composerStrictValidation = true;
     strictDeps = true;
-    vendorHash = "sha256-rXZlJ429AGwD3aBDIeLh12HJeT2ezky8kmpkllWJXQM=";
+    vendorHash = "sha256-wmxQWAOuQ9/vuB7LsCoMh1wUjFTZxTq4JtASSJ2V2rY=";
   };
 
   offlineCache = fetchYarnDeps {
     yarnLock = "${finalAttrs.src}/yarn.lock";
-    hash = "sha256-VLero9gHqkh6svauRSwZf2ASpEBu9iQcPUx+J77SR+o=";
+    hash = "sha256-B044HUiv2vqPCNn/WH97vzIZ/o6WFaM8fRzHQ1M/auI=";
   };
 
   installPhase = ''
