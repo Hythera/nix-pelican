@@ -1,3 +1,9 @@
+> [!WARNING]  
+> **Archival Notice**
+> 
+> I originally stated this project as a fork of PadowYT2's Pterodactyl Implementation with the intention of bringing Pelican support to Nix(OS). This has been fairly successful. I sadly don't really have the time and interest to maintain this project anymore. If you interested in keeping it alive, feel free to fork.
+> Efforts in upstreaming a similar module and package to `nixpkgs` have also been [in the works](https://github.com/NixOS/nixpkgs/pull/524420).
+
 <p align="center">
     <a href="https://pelican.dev/"><img src=".github/assets/nix-pelican.png" alt="Nix Pelican" height=170></a>
 </p>
